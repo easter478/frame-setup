@@ -8,7 +8,7 @@ It's a single small exe with no installer. It runs on the .NET Framework 4.8 tha
 
 All screenshots use made-up example data.
 
-**Status:** the screens and the live adb and dashboard checks have been tested. The full install hasn't been run on a real frame yet.
+**Status:** tested on a real frame. The APK in `apk/` is the same Frame Home version, with placeholder addresses in place of the ones used in that test.
 
 ## What you need
 
@@ -16,22 +16,20 @@ All screenshots use made-up example data.
 |---|---|
 | A Windows 10 or 11 PC | Runs the wizard and builds it. No other compiler is needed. |
 | A Lifelong Frameo frame | The wizard was made for these frames (rk312x, Android 6). Other models may not work. |
-| [Android platform-tools](https://developer.android.com/tools/releases/platform-tools) | Provides `adb`, the tool the PC uses to talk to the frame. |
-| `FrameHome.apk`, plus the Frame Home source folder | The app that gets installed. **It isn't in this repo.** The build also reads its version from `app\build.gradle.kts` in that folder. |
+| [Android platform-tools from Google](https://dl.google.com/android/repository/platform-tools-latest-windows.zip) | Provides `adb`, the tool the PC uses to talk to the frame. It isn't in this repo. Google also has an [information page](https://developer.android.com/tools/releases/platform-tools). |
 | A Frame Home dashboard | A server on your network that frames check in with. The wizard uses it to confirm the frame works. |
 | The frame and PC on the same network, or a USB cable | So they can reach each other. |
 
 ## Build it
 
 1. Download or clone this repo.
-2. By default, the build looks for platform-tools in `C:\Program Files\platform-tools` and for the Frame Home folder next to this one, at `..\FrameHome`. If yours are elsewhere, set these first, using your own paths:
+2. [Download platform-tools from Google](https://dl.google.com/android/repository/platform-tools-latest-windows.zip) and unzip it. By default, the build looks in `C:\Program Files\platform-tools`. If yours is elsewhere, set this first, using your own path:
 
    ```
    set PLATFORM_TOOLS=C:\path\to\platform-tools
-   set FRAMEHOME=C:\path\to\FrameHome
    ```
 
-3. Optional: to fill in your own dashboard address, create a file called `local-default-server.txt` in this folder containing just the address, for example `http://192.168.1.100:8100`. Git ignores this file, so it's never uploaded.
+3. Optional: to fill in your own dashboard address in the wizard, create a file called `local-default-server.txt` in this folder containing just the address, for example `http://192.168.1.100:8100`. Git ignores this file, so it's never uploaded.
 4. Run:
 
    ```
@@ -84,7 +82,9 @@ Press **Install**. The wizard installs the APK, retrying once if the known "fail
 
 ### 6. Dashboard
 
-Check the dashboard address, then wait. The wizard asks the dashboard every 5 seconds until this frame shows online with the right version. If it hasn't appeared after 2 minutes, set the address on the frame: long-press the photo, open **Settings**, enter the dashboard address and save.
+The Frame Home in this repo doesn't come with a dashboard address, so tell the frame where yours is first: long-press the photo, open **Settings**, type the dashboard address and save.
+
+Then check the same address in the wizard and wait. The wizard asks the dashboard every 5 seconds until this frame shows online with the right version. If it hasn't appeared after 2 minutes, it shows steps to fix it.
 
 ### 7. Stays open (optional)
 
@@ -99,6 +99,10 @@ The frame takes about **4–5 minutes** to come back, which is normal. The wizar
 ### 8. Finished
 
 You get a summary, plus **Open dashboard** and **Set up another**.
+
+## Using a different Frame Home build
+
+To bundle your own APK instead, set `FRAMEHOME` to your Frame Home project folder before building. The folder needs `FrameHome.apk` and `app\build.gradle.kts`. To keep this setting, put `set "FRAMEHOME=C:\path\to\FrameHome"` in a file called `local-build-settings.cmd` in this folder. Git ignores that file too.
 
 ## Good to know
 
@@ -133,10 +137,12 @@ You get a summary, plus **Open dashboard** and **Set up another**.
 | `src/Logo.cs` | Draws the logo in code. |
 | `src/MakeIcon.cs` | A small build-time tool that turns the logo into the icon files. |
 | `src/app.manifest` | Tells Windows the app is DPI-aware and doesn't need admin rights. |
+| `apk/FrameHome.apk` | The Frame Home app the wizard installs. Its Settings show placeholder addresses until you type your own. |
+| `apk/FrameHome.version` | The Frame Home version in that APK. |
 | `assets/` | The generated `app.ico` and `logo.png`. |
 | `docs/` | The screenshots in this README. |
 | `mockup/index.html` | The clickable design mockup. Open it in a browser. It isn't used by the app. |
-| `.gitignore` | Keeps build output, adb, the APK and your local address out of Git. |
+| `.gitignore` | Keeps build output, adb and your local settings out of Git. |
 
 **Created when you build, and not in this repo:**
 
@@ -144,7 +150,7 @@ You get a summary, plus **Open dashboard** and **Set up another**.
 |---|---|
 | `dist/FrameSetup.exe` | The app. |
 | `dist/adb.exe`, `AdbWinApi.dll`, `AdbWinUsbApi.dll` | The wizard's own copy of adb. |
-| `dist/FrameHome.apk` | The app that gets installed on the frame. |
+| `dist/FrameHome.apk` | A copy of the APK the wizard installs. |
 | `dist/FrameHome.version` | The Frame Home version the wizard expects to see. |
 | `dist/default-server.txt` | Your default dashboard address, only if you created `local-default-server.txt`. |
 

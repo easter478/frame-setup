@@ -786,6 +786,7 @@ namespace FrameSetup
         void BuildDashboard()
         {
             var p = pages[5] = new StepPage("Connect to the dashboard", "Frame Home checks in with your Frame Home dashboard. The wizard waits until it shows up there.");
+            p.Body.Add(Stack.Note("New frame? Tell it where the dashboard is first: on the frame, long-press the photo, open Settings, type the dashboard address and save."));
             var c = p.Body.Add(Stack.Card("Dashboard address"));
             serverBox = new TextBox { Width = Ui.S(290), Text = App.Get("server", App.DefaultServer) };
             c.Add(Ui.Row(serverBox, Ui.Btn("Check now", false, async (s, e) => { App.Set("server", serverBox.Text.Trim()); await PollDash(); }), Ui.Inline("Checking every 5 s", Ui.Muted)));

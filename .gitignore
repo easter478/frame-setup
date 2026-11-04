@@ -4,6 +4,8 @@ obj/
 *.exe
 *.dll
 *.apk
+!apk/FrameHome.apk
 
-# Your own default dashboard address
+# Your own default dashboard address and build folders
 local-default-server.txt
+local-build-settings.cmd
