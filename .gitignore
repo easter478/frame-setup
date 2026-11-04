@@ -1,0 +1,9 @@
+# Build output, including the adb files and the Frame Home APK that build.cmd copies in
+dist/
+obj/
+*.exe
+*.dll
+*.apk
+
+# Your own default dashboard address
+local-default-server.txt

@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frame Setup mockup</title>
+<style>
+  :root {
+    --head: #0f172a; --head-sub: #94a3b8; --bg: #f8fafc; --card: #ffffff; --line: #e2e8f0;
+    --text: #0f172a; --muted: #475569; --faint: #94a3b8; --accent: #2563eb; --accent-soft: #eff6ff;
+    --ok: #16a34a; --ok-soft: #f0fdf4; --bad: #dc2626; --bad-soft: #fef2f2; --wait: #d97706; --wait-soft: #fffbeb;
+    --mono: Consolas, "Cascadia Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #cbd5e1; font: 14px/1.45 "Segoe UI", system-ui, sans-serif; color: var(--text);
+         display: flex; flex-direction: column; align-items: center; padding: 28px 16px 40px; gap: 18px; }
+  .window { width: 920px; max-width: 100%; background: var(--bg); border-radius: 8px; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(15,23,42,.35); display: flex; flex-direction: column; }
+  /* Title bar coloured through DWM so it blends into the top bar */
+  .titlebar { background: var(--head); color: #e2e8f0; height: 32px; display: flex; align-items: center; padding-left: 10px; font-size: 12px; }
+  .titlebar .t { flex: 1; display: flex; align-items: center; gap: 8px; }
+  .titlebar .cap { width: 46px; height: 32px; display: grid; place-items: center; color: #cbd5e1; }
+  .titlebar .cap:hover { background: rgba(255,255,255,.08); }
+  .titlebar .cap.x:hover { background: #c42b1c; color: #fff; }
+  .topbar { background: var(--head); color: #fff; display: flex; align-items: center; gap: 14px; padding: 6px 20px 16px; }
+  .topbar h1 { margin: 0; font-size: 19px; font-weight: 600; }
+  .topbar p { margin: 0; color: var(--head-sub); font-size: 13px; }
+  .topbar .right { margin-left: auto; color: var(--head-sub); font-size: 12px; text-align: right; }
+  .main { display: flex; min-height: 540px; }
+  nav { width: 230px; border-right: 1px solid var(--line); background: #f1f5f9; padding: 14px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .step { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; cursor: pointer; color: var(--muted); }
+  .step:hover { background: #e2e8f0; }
+  .step.cur { background: var(--card); color: var(--text); box-shadow: 0 1px 2px rgba(15,23,42,.08); font-weight: 600; }
+  .dot { width: 22px; height: 22px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 12px; font-weight: 700;
+         background: #e2e8f0; color: var(--muted); }
+  .dot.passed { background: var(--ok); color: #fff; }
+  .dot.failed { background: var(--bad); color: #fff; }
+  .dot.waiting { background: var(--wait-soft); color: var(--wait); box-shadow: inset 0 0 0 2px var(--wait); }
+  nav .spacer { flex: 1; }
+  nav .link { color: var(--accent); font-size: 13px; padding: 6px 10px; cursor: pointer; }
+  nav .link:hover { text-decoration: underline; }
+  section { flex: 1; padding: 22px 26px 16px; display: flex; flex-direction: column; min-width: 0; }
+  section h2 { margin: 0 0 4px; font-size: 18px; }
+  .lead { color: var(--muted); margin: 0 0 14px; }
+  ol.how { margin: 0 0 14px; padding-left: 22px; } ol.how li { margin: 3px 0; }
+  .path { font-weight: 600; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
+  .card h3 { margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--faint); }
+  .check { display: flex; align-items: flex-start; gap: 10px; }
+  .check .ic { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #fff; flex: none; }
+  .check.waiting .ic { background: var(--wait); } .check.failed .ic { background: var(--bad); } .check.passed .ic { background: var(--ok); }
+  .check .msg { font-weight: 600; } .check .sub { color: var(--muted); font-size: 13px; }
+  .spin { animation: spin 1.2s linear infinite; display: inline-block; } @keyframes spin { to { transform: rotate(360deg); } }
+  .fix { background: var(--bad-soft); border-radius: 6px; padding: 10px 12px; margin-top: 10px; }
+  .fix b { color: #991b1b; } .fix ol { margin: 6px 0 0; padding-left: 20px; }
+  .note { background: var(--accent-soft); border-radius: 6px; padding: 10px 12px; color: #1e3a8a; font-size: 13px; margin-bottom: 12px; }
+  pre { margin: 0; font: 12.5px/1.5 var(--mono); background: #0f172a; color: #cbd5e1; border-radius: 6px; padding: 10px 12px; overflow-x: auto; white-space: pre-wrap; }
+  pre .g { color: #4ade80; } pre .r { color: #f87171; } pre .y { color: #fbbf24; } pre .d { color: #64748b; }
+  button { font: inherit; border-radius: 6px; padding: 7px 14px; cursor: pointer; border: 1px solid #cbd5e1; background: #fff; color: var(--text); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button:disabled { opacity: .45; cursor: default; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  input[type=text] { font: inherit; padding: 6px 9px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; }
+  label.tick { display: flex; gap: 8px; align-items: center; cursor: pointer; font-weight: 600; }
+  .seg { display: inline-flex; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  .seg span { padding: 6px 14px; cursor: pointer; background: #fff; } .seg span.on { background: var(--accent); color: #fff; }
+  table { border-collapse: collapse; width: 100%; } td, th { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); font-size: 13px; }
+  th { color: var(--faint); font-weight: 600; font-size: 12px; } td.k { color: var(--muted); width: 160px; }
+  tr.pick { cursor: pointer; } tr.pick:hover td { background: #f1f5f9; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+  .pill.ok { background: var(--ok-soft); color: var(--ok); } .pill.off { background: #f1f5f9; color: var(--muted); } .pill.warn { background: var(--wait-soft); color: var(--wait); }
+  .bar { height: 6px; border-radius: 3px; background: #e2e8f0; overflow: hidden; margin: 8px 0 4px; } .bar i { display: block; height: 100%; background: var(--accent); }
+  footer { display: flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); }
+  footer .st { flex: 1; color: var(--muted); font-size: 13px; }
+  .overlay { position: absolute; inset: 0; background: rgba(15,23,42,.45); display: none; align-items: center; justify-content: center; }
+  .overlay.on { display: flex; }
+  .dlg { background: #fff; border-radius: 8px; width: 560px; max-width: 92%; padding: 18px 20px; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
+  .dlg h2 { margin: 0 0 10px; font-size: 17px; } .dlg li { margin: 6px 0; }
+  .wrap { position: relative; width: 920px; max-width: 100%; }
+  .sim { width: 920px; max-width: 100%; background: #fff; border: 1px dashed #64748b; border-radius: 8px; padding: 10px 14px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 13px; }
+  .sim b { color: var(--muted); } .sim button { padding: 4px 10px; font-size: 13px; } .sim button.on { background: #334155; color: #fff; border-color: #334155; }
+  .sim .hint { color: var(--faint); flex-basis: 100%; }
+  .sum li { margin: 4px 0; }
+  @media (max-width: 760px) { .main { flex-direction: column; } nav { width: auto; flex-direction: row; flex-wrap: wrap; } nav .spacer { display: none; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<div class="window">
+  <div class="titlebar">
+    <div class="t"><svg width="16" height="16" viewBox="0 0 64 64"><use href="#logo"/></svg>Frame Setup</div>
+    <div class="cap">&#x2013;</div><div class="cap">&#x25A1;</div><div class="cap x">&#x2715;</div>
+  </div>
+  <div class="topbar">
+    <svg width="42" height="42" viewBox="0 0 64 64"><use href="#logo"/></svg>
+    <div><h1>Frame Setup</h1><p>Put Frame Home on a Lifelong Frameo photo frame, one step at a time</p></div>
+    <div class="right">Bundled: Frame Home 0.48 · adb 36.0.0</div>
+  </div>
+  <div class="main">
+    <nav id="nav"></nav>
+    <section id="pane"></section>
+  </div>
+</div>
+<div class="overlay" id="gotchas"><div class="dlg">
+  <h2>Good to know</h2>
+  <ul>
+    <li><b>ADB gets locked again.</b> Frameo clears this PC's ADB access every time the frame restarts or Frameo comes to the front. Fix: turn <span class="path">ADB access</span> off and on again in Frameo settings.</li>
+    <li><b>"failed to read copy response: EOF"</b> sometimes appears when installing. The wizard retries once by itself.</li>
+    <li><b>The wizard never taps the frame's screen.</b> ADB taps can register as a long-press on these frames, so you do the tapping yourself.</li>
+    <li><b>No system files are changed.</b> Frame Home is a normal app install; nothing under /system is touched.</li>
+    <li><b>After a restart Frame Home takes about 4–5 minutes to appear.</b> The frame's software blocks quick auto-start, so Frame Home brings itself back with a timer.</li>
+  </ul>
+  <div class="row" style="justify-content:flex-end"><button class="primary" onclick="gotchas(false)">OK</button></div>
+</div></div>
+</div>
+
+<div class="sim">
+  <b>Mockup only, not part of the app:</b> show this step as
+  <button data-s="waiting">Waiting</button><button data-s="failed">Failed</button><button data-s="passed">Passed</button>
+  <span class="hint">Click any step on the left. The buttons inside the window also work (Connect, Scan, Restart ADB, Install, Restart test…).</span>
+</div>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b82f6"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient>
+    <symbol id="logo" viewBox="0 0 64 64">
+      <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#lg)"/>
+      <rect x="12" y="15" width="40" height="30" rx="3" fill="none" stroke="#fff" stroke-width="4"/>
+      <path d="M16 41 l9-10 7 7 5-5 11 8z" fill="#fff"/>
+      <circle cx="42" cy="23" r="3.2" fill="#fff"/>
+      <rect x="27" y="47" width="10" height="4" rx="1" fill="#fff"/>
+      <circle cx="49" cy="49" r="9" fill="#22c55e" stroke="#1d4ed8" stroke-width="2"/>
+      <path d="M45 49 l3 3 5-6" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<script>
+const STEPS = ['Beta program', 'ADB access', 'Connect', 'Frame detected', 'Install Frame Home', 'Dashboard', 'Stays open', 'Finished'];
+const state = ['waiting', 'waiting', 'waiting', 'waiting', 'waiting', 'waiting', 'waiting', 'waiting'];
+let cur = 0, conn = 'wifi', ip = '192.168.1.50', server = 'http://192.168.1.100:8100', scanned = false, scanning = false;
+let restartMode = 'idle'; // idle | running
+const $ = s => document.querySelector(s);
+const ic = { waiting: '<span class="spin">&#x21bb;</span>', failed: '!', passed: '&#x2713;' };
+
+function check(s, msg, sub) {
+  return `<div class="check ${s}"><div class="ic">${ic[s]}</div><div><div class="msg">${msg}</div>${sub ? `<div class="sub">${sub}</div>` : ''}</div></div>`;
+}
+function fix(title, items) { return `<div class="fix"><b>${title}</b><ol>${items.map(i => `<li>${i}</li>`).join('')}</ol></div>`; }
+
+const views = [
+  // 1. Beta program
+  s => `
+    <h2>Turn on the Frameo beta program</h2>
+    <p class="lead">This unlocks the ADB access switch you need in the next step. Do this on the frame itself.</p>
+    <ol class="how">
+      <li>On the frame, swipe down from the top, or tap the photo, and open <span class="path">Settings</span> (the gear).</li>
+      <li>Scroll to the bottom and open <span class="path">About</span>.</li>
+      <li>Turn on <span class="path">Beta program</span>.</li>
+      <li>If the frame offers an update, let it install, then come back here.</li>
+    </ol>
+    <div class="card"><h3>Check</h3>
+      ${s === 'passed' ? check('passed', 'Beta program is on', 'You ticked this step.')
+      : s === 'failed' ? check('failed', 'Can\'t find Beta program?') + fix('Try this', ['Make sure the frame is connected to Wi-Fi: <span class="path">Settings → Wi-Fi</span>.', 'Update Frameo first: <span class="path">Settings → About → Check for update</span>.', 'Beta program sits just under the version number in <span class="path">About</span>.'])
+      : check('waiting', 'Waiting for you', 'This step can\'t be checked from the PC. Tick the box when it\'s on.')}
+      <label class="tick" style="margin-top:10px"><input type="checkbox" ${s === 'passed' ? 'checked' : ''} onchange="setState(0, this.checked ? 'passed' : 'waiting')"> Beta program is on</label>
+    </div>`,
+  // 2. ADB access
+  s => `
+    <h2>Turn on ADB access</h2>
+    <p class="lead">ADB access lets this PC install Frame Home. It appears in Frameo's settings once the beta program is on.</p>
+    <ol class="how">
+      <li>On the frame open <span class="path">Settings → About</span>.</li>
+      <li>Turn on <span class="path">ADB access</span>.</li>
+      <li><b>Already on?</b> Turn it <b>off and on again</b>. Frameo locks ADB out each time the frame restarts, so a fresh toggle is needed.</li>
+    </ol>
+    <div class="card"><h3>Check</h3>
+      ${s === 'passed' ? check('passed', 'ADB access is on', 'You ticked this step. The next step checks it for real.')
+      : s === 'failed' ? check('failed', 'No ADB access switch?') + fix('Try this', ['Go back one step and make sure <span class="path">Beta program</span> is on.', 'Let the frame install the beta update, restart it, then look again.', 'The switch is in <span class="path">Settings → About</span>, below Beta program.'])
+      : check('waiting', 'Waiting for you', 'Tick the box once ADB access is on (or you\'ve toggled it off and on).')}
+      <label class="tick" style="margin-top:10px"><input type="checkbox" ${s === 'passed' ? 'checked' : ''} onchange="setState(1, this.checked ? 'passed' : 'waiting')"> ADB access is on</label>
+    </div>`,
+  // 3. Connect
+  s => {
+    const dev = s === 'passed' ? `<span class="g">${conn === 'wifi' ? ip + ':5555' : 'ABC123456'}\tdevice</span>`
+      : s === 'failed' ? `<span class="y">${conn === 'wifi' ? ip + ':5555' : 'ABC123456'}\tunauthorized</span>` : '<span class="d">(nothing found)</span>';
+    return `
+    <h2>Connect to the frame</h2>
+    <p class="lead">Use a USB cable, or connect over Wi-Fi with the frame's IP address. Both work the same.</p>
+    <div class="seg"><span class="${conn === 'usb' ? 'on' : ''}" onclick="conn='usb';draw()">USB cable</span><span class="${conn === 'wifi' ? 'on' : ''}" onclick="conn='wifi';draw()">Wi-Fi</span></div>
+    ${conn === 'usb' ? `<ol class="how"><li>Plug a USB cable into the frame's micro-USB port and this PC.</li><li>The wizard finds it by itself within a few seconds.</li></ol>`
+    : `<div class="card"><h3>Frame address</h3>
+        <div class="row"><input type="text" id="ip" value="${ip}" style="width:150px" onchange="ip=this.value"> : <input type="text" value="5555" style="width:62px">
+        <button class="primary" onclick="connectWifi()">Connect</button><button onclick="scan()">${scanning ? '<span class="spin">&#x21bb;</span> Scanning…' : 'Scan network'}</button></div>
+        <div class="sub" style="color:var(--muted);font-size:13px;margin-top:6px">Find the IP on the frame: <span class="path">Settings → Wi-Fi</span>, tap the connected network.</div>
+        ${scanned ? `<table style="margin-top:10px"><tr><th>IP</th><th>Port 5555</th><th>Note</th><th></th></tr>
+          <tr class="pick" onclick="ip='192.168.1.40';draw()"><td>192.168.1.40</td><td><span class="pill ok">open</span></td><td>Kitchen frame (already has Frame Home 0.48)</td><td><button>Use</button></td></tr>
+          <tr class="pick" onclick="ip='192.168.1.50';draw()"><td>192.168.1.50</td><td><span class="pill ok">open</span></td><td>New device</td><td><button>Use</button></td></tr>
+          </table><div class="sub" style="color:var(--faint);font-size:12px;margin-top:4px">Scanned 192.168.1.0/24 in 3.1 s · 2 hosts with port 5555 open</div>` : ''}
+      </div>`}
+    <div class="card"><h3>Live: adb devices</h3>
+      <pre>List of devices attached\n${dev}</pre>
+      <div style="margin-top:10px">
+      ${s === 'passed' ? check('passed', 'Connected', 'The frame allowed this PC. Continue to the next step.')
+      : s === 'failed' ? check('failed', 'The frame is refusing this PC (unauthorized)') + fix('Fix it', ['On the frame turn <span class="path">ADB access</span> off and on again (Settings → About).', 'Look at the frame for <span class="path">Allow USB debugging?</span>, tick <span class="path">Always allow from this computer</span>, then tap <span class="path">OK</span>.', 'No prompt? Press <b>Restart ADB</b> below. This often fixes it.']) + `<div class="row" style="margin-top:10px"><button class="primary" onclick="restartAdb()">Restart ADB</button><span class="sub" style="color:var(--muted);font-size:13px">Runs adb kill-server, then adb start-server, then reconnects.</span></div>`
+      : check('waiting', 'Nothing found yet', conn === 'usb' ? 'Plug in the cable. Checking every 2 seconds.' : 'Enter the frame\'s IP and press Connect, or press Scan network.')}
+      </div>
+    </div>`;
+  },
+  // 4. Frame detected
+  s => `
+    <h2>Frame detected</h2>
+    <p class="lead">Information read from the frame. Nothing here needs changing.</p>
+    <div class="card"><h3>This frame</h3>
+      <table>
+        <tr><td class="k">Model</td><td>rk312x (Lifelong Frameo)</td></tr>
+        <tr><td class="k">Android</td><td>6.0.1 (API 23)</td></tr>
+        <tr><td class="k">Screen</td><td>1280 × 800</td></tr>
+        <tr><td class="k">Memory</td><td>1 GB</td></tr>
+        <tr><td class="k">Connected as</td><td>${ip}:5555</td></tr>
+        <tr><td class="k">Root (info only)</td><td>${s === 'failed' ? '<span class="pill off">not checked</span>' : '<span class="pill ok">works</span> <span style="color:var(--faint);font-family:var(--mono);font-size:12px">uid=0(root) gid=0(root)</span>'}</td></tr>
+        <tr><td class="k">Frame Home</td><td><span class="pill off">not installed</span></td></tr>
+      </table>
+    </div>
+    <div class="card"><h3>Check</h3>
+      ${s === 'passed' ? check('passed', 'Looks like a Frameo frame Frame Home supports')
+      : s === 'failed' ? check('failed', 'Lost the connection while reading the frame') + fix('Fix it', ['Frameo probably came to the front and locked ADB again.', 'Turn <span class="path">ADB access</span> off and on again on the frame.', 'Go back to <b>Connect</b> and connect again.']) + `<div class="row" style="margin-top:10px"><button onclick="go(2)">Back to Connect</button></div>`
+      : check('waiting', 'Reading frame details…', 'getprop, wm size, su -c id')}
+    </div>`,
+  // 5. Install
+  s => `
+    <h2>Install Frame Home</h2>
+    <p class="lead">Installs the copy of Frame Home that comes with this wizard, then opens it on the frame.</p>
+    <div class="card"><h3>Install</h3>
+      <div class="row"><button class="primary" onclick="install()" ${s === 'passed' ? 'disabled' : ''}>Install Frame Home 0.48</button><span class="sub" style="color:var(--muted);font-size:13px">FrameHome.apk · 2.3 MB</span></div>
+      ${s !== 'waiting' || installing ? `<pre style="margin-top:10px"><span class="d">&gt; adb install -r FrameHome.apk</span>
+Performing Streamed Install
+<span class="y">adb: failed to read copy response: EOF</span>
+<span class="d">Known glitch. Retrying once…</span>
+<span class="d">&gt; adb install -r FrameHome.apk</span>
+${s === 'failed' ? '<span class="r">adb: failed to read copy response: EOF</span>' : s === 'passed' ? `<span class="g">Success</span>
+<span class="d">&gt; dumpsys package com.framehome.app | grep versionName</span>
+    versionName=0.48
+<span class="d">&gt; am start -n com.framehome.app/.MainActivity</span>
+Starting: Intent { cmp=com.framehome.app/.MainActivity }` : 'Performing Streamed Install…'}</pre>` : ''}
+    </div>
+    <div class="card"><h3>Check</h3>
+      ${s === 'passed' ? check('passed', 'Frame Home 0.48 installed and open', 'You should see Frame Home on the frame now.')
+      : s === 'failed' ? check('failed', 'Install failed twice') + fix('Fix it', ['Turn <span class="path">ADB access</span> off and on again on the frame (Frameo may have locked it).', 'Go back to <b>Connect</b>, wait for <i>Connected</i>, then come back and press Install again.', 'On USB, try another cable or port.'])
+      : check('waiting', installing ? 'Installing…' : 'Ready to install', installing ? 'This takes about 20 seconds.' : 'Press the button above.')}
+    </div>`,
+  // 6. Dashboard
+  s => `
+    <h2>Connect to the dashboard</h2>
+    <p class="lead">Frame Home checks in with your Frame Home dashboard. The wizard waits until it shows up there.</p>
+    <div class="card"><h3>Dashboard address</h3>
+      <div class="row"><input type="text" value="${server}" style="width:280px" onchange="server=this.value"><button onclick="draw()">Check now</button><span class="sub" style="color:var(--muted);font-size:13px">Checking every 5 s</span></div>
+    </div>
+    <div class="card"><h3>Frames the dashboard knows</h3>
+      <table><tr><th>Name</th><th>ID</th><th>State</th><th>Version</th><th>Screen</th></tr>
+        <tr><td>Hallway frame</td><td style="font-family:var(--mono)">demo0001</td><td>${s === 'passed' ? '<span class="pill ok">online</span>' : '<span class="pill off">offline</span>'}</td><td>${s === 'passed' ? '0.48' : '–'}</td><td>${s === 'passed' ? '1280×800' : '–'}</td></tr>
+        <tr><td>Kitchen frame</td><td style="font-family:var(--mono)">demo0002</td><td><span class="pill ok">online</span></td><td>0.48</td><td>1280×800</td></tr>
+      </table>
+      <div style="margin-top:10px">
+      ${s === 'passed' ? check('passed', 'Hallway frame is online with Frame Home 0.48', 'Came online 0:14 after install.')
+      : s === 'failed' ? check('failed', 'The frame hasn\'t checked in after 2 minutes') + fix('Fix it', ['On the frame, <b>long-press the photo</b> and open <span class="path">Settings</span> in Frame Home.', `Set <span class="path">Dashboard address</span> to <span style="font-family:var(--mono)">${server}</span>.`, 'Make sure the frame and the dashboard are on networks that can reach each other.'])
+      : check('waiting', 'Waiting for the frame to check in…', 'Usually takes under 30 seconds after install.')}
+      </div>
+    </div>`,
+  // 7. Stays open
+  s => `
+    <h2>Stays open</h2>
+    <p class="lead">Frame Home's <span class="path">Keep open</span> is on by default, so it comes back after Frameo or a restart pushes it away.</p>
+    <div class="note">After a restart Frame Home takes about <b>4–5 minutes</b> to appear. The frame's software blocks quick auto-start, so Frame Home brings itself back with a timer. That's normal.</div>
+    <div class="card"><h3>Optional: restart test</h3>
+      <div class="row"><button class="primary" onclick="restartTest()" ${restartMode === 'running' ? 'disabled' : ''}>Restart the frame</button><button onclick="setState(6,'passed')">Skip</button></div>
+      <div class="sub" style="color:var(--muted);font-size:13px;margin-top:6px">Runs adb reboot, then watches the dashboard. ADB will be locked after the restart, so the dashboard is the check, not ADB.</div>
+      ${restartMode === 'running' || s !== 'waiting' ? `<div class="bar"><i style="width:${s === 'passed' ? 100 : s === 'failed' ? 100 : 58}%"></i></div>
+        <div class="sub" style="color:var(--faint);font-size:12px">${s === 'passed' ? 'Back online after 4:37' : s === 'failed' ? '8:00 elapsed' : '2:51 elapsed · usually 4–5 min'}</div>` : ''}
+      <div style="margin-top:10px">
+      ${s === 'passed' ? check('passed', 'Frame Home came back by itself', 'Hallway frame online again at 4:37 with 0.48.')
+      : s === 'failed' ? check('failed', 'Hallway frame hasn\'t come back after 8 minutes') + fix('Try this', ['Look at the frame. If Frameo is showing, wait two more minutes; Frame Home returns on a timer.', 'Long-press the photo in Frame Home → Settings, and make sure <span class="path">Keep open</span> is on.', 'Still nothing? Open Frame Home from the frame\'s app list once, then run this test again.'])
+      : restartMode === 'running' ? check('waiting', 'Frame is restarting… dashboard shows offline', 'Checking the dashboard every 10 s.') : check('waiting', 'Not run yet', 'Run the test, or skip it.')}
+      </div>
+    </div>`,
+  // 8. Finished
+  s => `
+    <h2>${state.slice(0, 7).every(x => x === 'passed') ? 'All done' : 'Almost done'}</h2>
+    <p class="lead">Summary for this frame.</p>
+    <div class="card"><ul class="sum" style="margin:0;padding-left:18px">
+      ${STEPS.slice(0, 7).map((n, i) => `<li>${state[i] === 'passed' ? '&#x2713;' : state[i] === 'failed' ? '&#x2717;' : '–'} ${n}${i === 6 && state[i] === 'passed' ? ' (back after 4:37)' : ''}</li>`).join('')}
+    </ul></div>
+    <div class="card"><table>
+      <tr><td class="k">Frame</td><td>Hallway frame · demo0001</td></tr>
+      <tr><td class="k">Address</td><td>${ip}</td></tr>
+      <tr><td class="k">Frame Home</td><td>0.48</td></tr>
+      <tr><td class="k">Dashboard</td><td>${server}</td></tr>
+    </table></div>
+    <div class="note">Change photos, style and buttons from the dashboard or on the frame (long-press the photo → Settings). To set up another frame, press <b>Set up another</b>.</div>
+    <div class="row"><button class="primary" onclick="resetAll()">Set up another</button><button onclick="window.open('${server}')">Open dashboard</button></div>`
+];
+
+let installing = false;
+function connectWifi() { setState(2, 'waiting'); setTimeout(() => setState(2, 'failed'), 700); }
+function restartAdb() { setState(2, 'waiting'); setTimeout(() => setState(2, 'passed'), 900); }
+function scan() { scanning = true; draw(); setTimeout(() => { scanning = false; scanned = true; draw(); }, 900); }
+function install() { installing = true; setState(4, 'waiting'); setTimeout(() => { installing = false; setState(4, 'passed'); }, 1200); }
+function restartTest() { restartMode = 'running'; setState(6, 'waiting'); setTimeout(() => { restartMode = 'idle'; setState(6, 'passed'); }, 1600); }
+function resetAll() { state.fill('waiting'); scanned = false; cur = 0; draw(); }
+function gotchas(on) { $('#gotchas').classList.toggle('on', on); }
+function setState(i, s) { state[i] = s; if (i === 7) state[7] = s; draw(); }
+function go(i) { cur = i; draw(); }
+
+function draw() {
+  if (state.slice(0, 7).every(x => x === 'passed')) state[7] = 'passed';
+  $('#nav').innerHTML = STEPS.map((n, i) => `<div class="step ${i === cur ? 'cur' : ''}" onclick="go(${i})"><div class="dot ${i === cur || state[i] !== 'waiting' ? state[i] : ''}">${state[i] === 'passed' ? '&#x2713;' : state[i] === 'failed' ? '!' : i + 1}</div>${n}</div>`).join('')
+    + `<div class="spacer"></div><div class="link" onclick="gotchas(true)">Good to know…</div><div class="link" style="color:var(--faint);cursor:default">Log: frame-setup.log</div>`;
+  const s = state[cur];
+  const next = cur < 7 ? `<button class="primary" onclick="go(${cur + 1})" ${s === 'passed' || cur === 6 ? '' : 'disabled'}>${cur === 6 && s !== 'passed' ? 'Skip' : 'Next'}</button>` : `<button class="primary" onclick="alert('Closes the wizard')">Close</button>`;
+  const status = { waiting: 'Waiting for this step', failed: 'Needs a fix, see above', passed: 'Done' }[s];
+  $('#pane').innerHTML = views[cur](s) + `<footer><div class="st">Step ${cur + 1} of 8 · ${status}</div><button onclick="go(${Math.max(0, cur - 1)})" ${cur === 0 ? 'disabled' : ''}>Back</button>${next}</footer>`;
+  document.querySelectorAll('.sim button').forEach(b => b.classList.toggle('on', b.dataset.s === s));
+}
+document.querySelectorAll('.sim button').forEach(b => b.onclick = () => { if (cur === 6) restartMode = b.dataset.s === 'waiting' ? 'running' : 'idle'; setState(cur, b.dataset.s); });
+draw();
+</script>
+</body>
+</html>
